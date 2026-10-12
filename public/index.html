@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+    <meta name="color-scheme" content="dark">
+    <title>MiniTalk</title>
+    <link href="webfonts/NotoSans/stylesheet.css" rel="stylesheet">
+    <link href="css/fontawesome.min.css" rel="stylesheet">
+    <link href="css/solid.min.css" rel="stylesheet">
+    <link href="css/brands.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <script type="module" src="script.js"></script>
+</head>
+
+<body>
+    <aside id="control_panel" aria-label="Control panel" inert>
+        <div class="panel-header">
+            <div class="panel-tabs" role="tablist" aria-label="Control panel sections">
+                <button id="tab_api" type="button" role="tab" data-tab="api" aria-controls="panel_api"><i class="fa-solid fa-plug"></i><span>API</span></button>
+                <button id="tab_prompt" type="button" role="tab" data-tab="prompt" aria-controls="panel_prompt"><i class="fa-solid fa-scroll"></i><span>Prompt</span></button>
+            </div>
+            <button id="control_panel_close" type="button" class="fa-solid fa-angles-right" title="Close panel" aria-label="Close panel"></button>
+        </div>
+
+        <section id="panel_api" class="panel-page" role="tabpanel" aria-labelledby="tab_api" hidden>
+            <label class="panel-label" for="chat_completion_source">Provider</label>
+            <select id="chat_completion_source"></select>
+
+            <label class="panel-label" for="model_select">Model</label>
+            <div class="panel-row">
+                <select id="model_select"></select>
+                <button id="refresh_models" type="button" class="menu_button fa-solid fa-arrows-rotate" title="Reload the model list" aria-label="Reload the model list"></button>
+            </div>
+
+            <div class="connection-status">
+                <span class="status-dot" data-connection-status data-state="idle"></span>
+                <span id="connection_status_text"></span>
+            </div>
+        </section>
+
+        <section id="panel_prompt" class="panel-page" role="tabpanel" aria-labelledby="tab_prompt" hidden>
+            <div class="panel-row prompt-list-header">
+                <span class="panel-label">Prompts</span>
+                <button id="prompt_add" type="button" class="menu_button"><i class="fa-solid fa-plus"></i>&nbsp;Add prompt</button>
+            </div>
+            <p class="panel-hint">Each prompt is sent as a user message at its depth: 0 = after the last chat message, 1 = before the last message, and so on. Prompts at the same depth follow this list's order; drag <i class="fa-solid fa-grip-vertical"></i> to reorder.</p>
+            <ol id="prompt_list" class="prompt-list" aria-label="Prompts"></ol>
+            <div class="panel-row panel-footer">
+                <span id="prompt_total" class="panel-hint"></span>
+            </div>
+        </section>
+    </aside>
+
+    <main id="sheld">
+        <div id="chat" aria-live="polite"></div>
+        <div id="form_sheld">
+            <div id="options" role="menu" aria-labelledby="options_button" hidden>
+                <button id="option_start_new_chat" type="button" role="menuitem"><i class="fa-solid fa-comments"></i><span>Start new chat</span></button>
+                <button id="option_delete_mes" type="button" role="menuitem"><i class="fa-solid fa-trash-can"></i><span>Delete messages</span></button>
+                <button id="option_inspect_prompt" type="button" role="menuitem"><i class="fa-solid fa-magnifying-glass"></i><span>Inspect prompt</span></button>
+            </div>
+            <div id="dialogue_del_mes" hidden>
+                <span id="dialogue_del_mes_hint"></span>
+                <button id="dialogue_del_mes_cancel" type="button" class="menu_button">Cancel</button>
+                <button id="dialogue_del_mes_ok" type="button" class="menu_button danger">Delete</button>
+            </div>
+            <form id="send_form" autocomplete="off">
+                <div id="leftSendForm">
+                    <button id="options_button" type="button" class="fa-solid fa-bars" title="Options" aria-label="Options" aria-haspopup="menu" aria-expanded="false" aria-controls="options"></button>
+                </div>
+                <textarea id="send_textarea" rows="1" placeholder="Type a message…" aria-label="Message"></textarea>
+                <div id="rightSendForm">
+                    <button id="control_panel_toggle" type="button" title="Control panel" aria-label="Control panel" aria-controls="control_panel" aria-expanded="false">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span class="status-dot" data-connection-status data-state="idle"></span>
+                    </button>
+                    <button id="mes_stop" type="button" class="fa-solid fa-circle-stop" title="Stop generating" aria-label="Stop generating" hidden></button>
+                    <button id="send_but" type="submit" class="fa-solid fa-paper-plane" title="Send" aria-label="Send"></button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <div id="toast-container" aria-live="assertive"></div>
+</body>
+
+</html>

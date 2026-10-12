@@ -1,0 +1,1360 @@
+/*
+ * MiniTalk base styles.
+ * Colour variables keep SillyTavern's names and default values, so themes and
+ * extension CSS written against ST's --SmartTheme* variables apply unchanged.
+ */
+:root {
+    --transparent: rgba(0, 0, 0, 0);
+    --black30a: rgba(0, 0, 0, 0.3);
+    --black50a: rgba(0, 0, 0, 0.5);
+    --black70a: rgba(0, 0, 0, 0.7);
+    --white20a: rgba(255, 255, 255, 0.2);
+    --white30a: rgba(255, 255, 255, 0.3);
+    --white50a: rgba(255, 255, 255, 0.5);
+    --white100: rgba(255, 255, 255, 1);
+    --grey10: rgb(25, 25, 25);
+    --grey30: rgb(75, 75, 75);
+    --grey50: rgb(125, 125, 125);
+    --grey70: rgb(175, 175, 175);
+    --crimson70a: rgba(100, 0, 0, 0.7);
+    --okGreen70a: rgba(0, 100, 0, 0.7);
+    --golden: rgb(248, 211, 0);
+    --active: rgb(88, 182, 0);
+    --warning: rgba(255, 0, 0, 0.9);
+
+    --SmartThemeBodyColor: rgb(220, 220, 210);
+    --SmartThemeEmColor: rgb(145, 145, 145);
+    --SmartThemeUnderlineColor: rgb(188, 231, 207);
+    --SmartThemeQuoteColor: rgb(225, 138, 36);
+    --SmartThemeBlurTintColor: rgba(23, 23, 23, 1);
+    --SmartThemeChatTintColor: rgba(23, 23, 23, 1);
+    --SmartThemeUserMesBlurTintColor: rgba(0, 0, 0, 0.3);
+    --SmartThemeBotMesBlurTintColor: rgba(60, 60, 60, 0.3);
+    --SmartThemeShadowColor: rgba(0, 0, 0, 0.5);
+    --SmartThemeBorderColor: rgba(0, 0, 0, 0.5);
+
+    --reasoning-body-color: var(--SmartThemeEmColor);
+
+    --sheldWidth: 40vw;
+    --fontScale: 1.2;
+    --mainFontSize: calc(var(--fontScale) * 15px);
+    --mainFontFamily: "Noto Sans", sans-serif;
+    --monoFontFamily: 'Noto Sans Mono', 'Courier New', Consolas, monospace;
+    --avatarSize: 50px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Elements with their own `display` would otherwise ignore the attribute. */
+[hidden] {
+    display: none !important;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    /* Chat column geometry. Centered normally; with the control panel open on
+       a wide screen it narrows/shifts so the panel never covers it, and the
+       panel fills everything right of the chat. */
+    --panelMinWidth: clamp(390px, 25vw, 900px);
+    --chatWidth: var(--sheldWidth);
+    --chatLeft: calc((100vw - var(--chatWidth)) / 2);
+    /* Where the chat sits while the panel is open (wide screens). It stays
+       centered if that leaves the panel its minimum width, else shifts left. */
+    --openChatWidth: min(var(--sheldWidth), calc(100vw - var(--panelMinWidth) - 10px));
+    --openChatLeft: min(calc((100vw - var(--openChatWidth)) / 2), calc(100vw - var(--panelMinWidth) - var(--openChatWidth)));
+    --panelWidth: calc(100vw - var(--openChatLeft) - var(--openChatWidth));
+
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(12, 12, 12);
+    color: var(--SmartThemeBodyColor);
+    font-family: var(--mainFontFamily);
+    font-size: var(--mainFontSize);
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+button,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--grey30);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* ── Controls ────────────────────────────── */
+
+select {
+    background-color: var(--black30a);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    padding: 3px 5px;
+    cursor: pointer;
+}
+
+select:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+option {
+    background-color: var(--SmartThemeBlurTintColor);
+}
+
+.status-dot {
+    flex: 0 0 auto;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: var(--grey50);
+}
+
+.status-dot[data-state="ready"] {
+    background-color: var(--active);
+}
+
+.status-dot[data-state="loading"] {
+    background-color: var(--golden);
+}
+
+.status-dot[data-state="error"] {
+    background-color: var(--warning);
+}
+
+.menu_button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;
+    background-color: var(--black30a);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s, filter 0.2s;
+}
+
+.menu_button:hover {
+    opacity: 1;
+    filter: brightness(1.2);
+}
+
+.menu_button:disabled {
+    opacity: 0.4;
+    filter: none;
+    cursor: default;
+}
+
+.menu_button.primary {
+    background-color: var(--okGreen70a);
+}
+
+.menu_button.danger {
+    background-color: var(--crimson70a);
+}
+
+/* ── Chat column ─────────────────────────── */
+
+#sheld {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    width: var(--chatWidth);
+    min-height: 0;
+    margin: 0 0 0 var(--chatLeft);
+    transition: margin-left 0.25s ease, width 0.25s ease;
+}
+
+#chat {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    background-color: var(--SmartThemeChatTintColor);
+    border-left: 1px solid var(--SmartThemeBorderColor);
+    border-right: 1px solid var(--SmartThemeBorderColor);
+    box-shadow: 0 0 20px var(--black70a);
+}
+
+.mes {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 25px 10px 10px;
+    border-bottom: 1px solid var(--white20a);
+}
+
+.mes:last-child {
+    border-bottom: none;
+}
+
+.mes[is_user="true"] {
+    background-color: var(--SmartThemeUserMesBlurTintColor);
+}
+
+.mes[is_user="false"] {
+    background-color: var(--SmartThemeBotMesBlurTintColor);
+}
+
+.avatar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--avatarSize);
+    height: var(--avatarSize);
+    border-radius: 50%;
+    border: 1px solid var(--SmartThemeBorderColor);
+    box-shadow: 0 0 5px var(--black50a);
+    background-color: var(--grey30);
+    font-size: calc(var(--mainFontSize) * 1.3);
+    font-weight: 600;
+    user-select: none;
+}
+
+.mes[is_user="false"] .avatar {
+    background-color: rgb(90, 70, 45);
+}
+
+.mes_block {
+    flex: 1;
+    min-width: 0;
+}
+
+.ch_name {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.name_text {
+    font-weight: 600;
+}
+
+.timestamp {
+    font-size: calc(var(--mainFontSize) * 0.8);
+    color: var(--SmartThemeEmColor);
+}
+
+.mes_text {
+    padding-top: 2px;
+    overflow-wrap: anywhere;
+}
+
+/* Per-message buttons (copy / edit), revealed on hover or keyboard focus */
+.mes_buttons,
+.mes_edit_buttons {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+}
+
+.mes_buttons {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.mes:hover .mes_buttons,
+.mes:focus-within .mes_buttons {
+    opacity: 1;
+}
+
+/* Touch screens have no hover */
+@media (hover: none) {
+    .mes_buttons {
+        opacity: 1;
+    }
+}
+
+.mes_button {
+    padding: 2px 5px;
+    border: none;
+    background: none;
+    font-size: calc(var(--mainFontSize) * 0.9);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.mes_button:hover,
+.mes_button:focus-visible {
+    opacity: 1;
+}
+
+.mes.editing .mes_buttons,
+.mes:not(.editing) .mes_edit_buttons,
+.mes.generating .mes_buttons,
+.delete-mode .mes_buttons,
+.mes.editing .mes_text {
+    display: none;
+}
+
+.edit_textarea {
+    display: block;
+    width: 100%;
+    margin-top: 4px;
+    padding: 6px 8px;
+    background-color: var(--black30a);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    outline: none;
+    line-height: 1.5;
+    resize: none;
+    overflow: hidden;
+}
+
+.edit_textarea:focus {
+    border-color: var(--white30a);
+}
+
+.mes_text p {
+    margin: 0 0 0.6em;
+}
+
+.mes_text p:last-child {
+    margin-bottom: 0;
+}
+
+.mes_text em,
+.mes_text i {
+    color: var(--SmartThemeEmColor);
+}
+
+.mes_text u {
+    color: var(--SmartThemeUnderlineColor);
+}
+
+/* Quoted speech is wrapped in <q> (as in SillyTavern, so themes can colour it)
+   but keeps its own quote characters, so the browser must not add its own —
+   without this rule "example" shows up as “"example"”. */
+.mes_text q {
+    color: var(--SmartThemeQuoteColor);
+    quotes: none;
+}
+
+.mes_text q::before,
+.mes_text q::after {
+    content: none;
+}
+
+.mes_text code {
+    font-family: var(--monoFontFamily);
+    font-size: 0.9em;
+    background-color: var(--black50a);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 4px;
+    padding: 0 4px;
+}
+
+.mes_text pre {
+    margin: 0.5em 0;
+    padding: 8px 10px;
+    background-color: var(--black50a);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.mes_text pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    white-space: pre;
+}
+
+.mes.generating .mes_text:empty::after {
+    content: '…';
+    color: var(--SmartThemeEmColor);
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* Reasoning ("thoughts") block, as in SillyTavern */
+.mes_reasoning_details {
+    margin: 4px 0 6px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    background-color: var(--black30a);
+}
+
+.mes_reasoning_summary {
+    padding: 3px 8px;
+    cursor: pointer;
+    color: var(--SmartThemeEmColor);
+    font-size: calc(var(--mainFontSize) * 0.9);
+    user-select: none;
+}
+
+.mes_reasoning {
+    padding: 4px 10px 8px;
+    color: var(--reasoning-body-color);
+    font-size: calc(var(--mainFontSize) * 0.9);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+/* ── Send form ───────────────────────────── */
+
+#form_sheld {
+    position: relative;
+    flex: 0 0 auto;
+    /*padding-bottom: 5px;*/
+}
+
+#send_form {
+    display: flex;
+    align-items: flex-end;
+    background-color: var(--SmartThemeBlurTintColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    /*border-radius: 0 0 10px 10px;
+    box-shadow: 0 0 20px var(--black70a);*/
+    padding: 4px 6px;
+}
+
+#send_textarea {
+    flex: 1;
+    min-height: calc(var(--mainFontSize) * 2.2);
+    max-height: 50vh;
+    padding: 6px 8px;
+    border: none;
+    outline: none;
+    background: transparent;
+    resize: none;
+    line-height: 1.4;
+}
+
+#leftSendForm,
+#rightSendForm {
+    display: flex;
+    align-items: center;
+}
+
+#leftSendForm button,
+#rightSendForm button {
+    width: calc(var(--mainFontSize) * 2.2);
+    height: calc(var(--mainFontSize) * 2.2);
+    border: none;
+    background: none;
+    font-size: calc(var(--mainFontSize) * 1.2);
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+#leftSendForm button:hover,
+#rightSendForm button:hover,
+#options_button[aria-expanded="true"],
+#control_panel_toggle.active {
+    opacity: 1;
+}
+
+#control_panel_toggle {
+    position: relative;
+}
+
+#control_panel_toggle.active {
+    color: var(--SmartThemeQuoteColor);
+}
+
+/* Connection badge on the panel toggle: only shown when something's wrong. */
+#control_panel_toggle .status-dot {
+    position: absolute;
+    top: 5px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    box-shadow: 0 0 0 2px var(--SmartThemeBlurTintColor);
+}
+
+#control_panel_toggle .status-dot:not([data-state="error"]) {
+    display: none;
+}
+
+#mes_stop {
+    color: var(--SmartThemeQuoteColor);
+}
+
+/* Options menu (opens upwards from the burger button) */
+#options {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 220px;
+    margin-bottom: 6px;
+    padding: 5px;
+    background-color: var(--SmartThemeBlurTintColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 10px;
+    box-shadow: 0 0 20px var(--black70a);
+    z-index: 20;
+}
+
+#options button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+#options button:hover,
+#options button:focus-visible {
+    background-color: var(--white20a);
+    outline: none;
+}
+
+#options i {
+    width: 1.2em;
+    text-align: center;
+    opacity: 0.8;
+}
+
+/* Delete-messages mode */
+#dialogue_del_mes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: calc(var(--mainFontSize) * 2.2 + 10px);
+    padding: 5px 10px;
+    background-color: var(--SmartThemeBlurTintColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 0 20px var(--black70a);
+}
+
+#dialogue_del_mes_hint {
+    flex: 1;
+    color: var(--SmartThemeEmColor);
+}
+
+.del_checkbox {
+    display: none;
+    margin: 0 0 0 auto;
+    pointer-events: none;
+    accent-color: var(--warning);
+}
+
+.delete-mode .del_checkbox {
+    display: inline-block;
+}
+
+.delete-mode .mes {
+    cursor: pointer;
+}
+
+.delete-mode .mes:hover {
+    filter: brightness(1.15);
+}
+
+.mes.selected {
+    box-shadow: inset 4px 0 0 var(--warning);
+}
+
+/* ── Control panel (right side) ──────────── */
+
+#control_panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    width: var(--panelWidth);
+    background-color: var(--SmartThemeBlurTintColor);
+    border-left: 1px solid var(--SmartThemeBorderColor);
+    /*box-shadow: -2px 0 20px var(--black70a);*/
+    transform: translateX(calc(100% + 25px));
+    transition: transform 0.25s ease;
+}
+
+body.panel-open #control_panel {
+    transform: none;
+}
+
+/* Wide screens: the chat makes room and the panel reaches its right edge. */
+@media (min-width: 1001px) {
+    body.panel-open {
+        --chatWidth: var(--openChatWidth);
+        --chatLeft: var(--openChatLeft);
+    }
+}
+
+/* Applies the remembered open/closed state on load without animating. */
+body.no-transition #control_panel,
+body.no-transition #sheld {
+    transition: none;
+}
+
+.panel-header {
+    display: flex;
+    flex: 0 0 auto;
+    border-bottom: 1px solid var(--SmartThemeBorderColor);
+    background-color: var(--black30a);
+}
+
+.panel-tabs {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#control_panel_close {
+    flex: 0 0 auto;
+    width: calc(var(--mainFontSize) * 1.9);
+    border: none;
+    border-left: 1px solid var(--SmartThemeBorderColor);
+    background: none;
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+#control_panel_close:hover,
+#control_panel_close:focus-visible {
+    opacity: 1;
+    background-color: var(--white20a);
+    outline: none;
+}
+
+.panel-tabs [role="tab"] {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+    padding: 8px 2px 6px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    font-size: calc(var(--mainFontSize) * 0.8);
+    cursor: pointer;
+    opacity: 0.65;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+.panel-tabs [role="tab"] i {
+    font-size: calc(var(--mainFontSize) * 1.15);
+}
+
+.panel-tabs [role="tab"] span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panel-tabs [role="tab"]:hover:not(:disabled),
+.panel-tabs [role="tab"]:focus-visible {
+    opacity: 1;
+    background-color: var(--white20a);
+    outline: none;
+}
+
+.panel-tabs [role="tab"][aria-selected="true"] {
+    opacity: 1;
+    border-bottom-color: var(--SmartThemeQuoteColor);
+}
+
+.panel-tabs [role="tab"]:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.panel-page {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    padding: 12px 14px;
+    overflow-y: auto;
+}
+
+.panel-label {
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+.panel-label:first-child {
+    margin-top: 0;
+}
+
+.panel-hint {
+    margin: 0;
+    font-size: calc(var(--mainFontSize) * 0.85);
+    color: var(--SmartThemeEmColor);
+}
+
+.panel-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.panel-page select {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 8px;
+}
+
+.panel-row select {
+    flex: 1 1 auto;
+    width: auto;
+}
+
+.connection-status {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    background-color: var(--black30a);
+    font-size: calc(var(--mainFontSize) * 0.9);
+}
+
+.connection-status .status-dot {
+    transform: translateY(-1px);
+}
+
+#connection_status_text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#connection_status_text[data-state="error"] {
+    color: rgb(255, 140, 130);
+}
+
+/* Prompt manager */
+.prompt-list-header {
+    justify-content: space-between;
+}
+
+.prompt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.prompt-item {
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 6px;
+    background-color: var(--black30a);
+}
+
+.prompt-item.disabled .prompt-item-header > :not(.prompt-enabled-label, .prompt-delete, .prompt-drag) {
+    opacity: 0.45;
+}
+
+.prompt-item.dragging {
+    border-color: var(--SmartThemeQuoteColor);
+    box-shadow: 0 4px 16px var(--black70a);
+    opacity: 0.9;
+}
+
+.prompt-list.reordering {
+    cursor: grabbing;
+    user-select: none;
+}
+
+.prompt-item-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+}
+
+.prompt-item-header button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.prompt-drag {
+    padding: 4px 6px;
+    cursor: grab !important;
+    opacity: 0.55;
+    /* Let pointer events drive the drag on touch screens. */
+    touch-action: none;
+}
+
+.prompt-drag:hover,
+.prompt-drag:focus-visible {
+    opacity: 1;
+}
+
+.prompt-toggle {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 4px 2px;
+    text-align: left;
+}
+
+.prompt-toggle i {
+    font-size: 0.8em;
+    opacity: 0.7;
+    transition: transform 0.15s;
+}
+
+.prompt-toggle[aria-expanded="true"] i {
+    transform: rotate(90deg);
+}
+
+.prompt-item-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.prompt-depth-badge,
+.prompt-item-tokens {
+    flex: 0 0 auto;
+    font-size: calc(var(--mainFontSize) * 0.75);
+    color: var(--SmartThemeEmColor);
+    white-space: nowrap;
+}
+
+.prompt-depth-badge {
+    padding: 0 6px;
+    border-radius: 4px;
+    background-color: var(--white20a);
+    color: inherit;
+}
+
+.prompt-enabled-label {
+    display: flex;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.prompt-enabled {
+    margin: 0;
+    accent-color: var(--SmartThemeQuoteColor);
+    cursor: pointer;
+}
+
+.prompt-delete {
+    padding: 4px 6px;
+    opacity: 0.55;
+}
+
+.prompt-delete:hover,
+.prompt-delete:focus-visible {
+    opacity: 1;
+    color: rgb(255, 140, 130);
+}
+
+.prompt-item-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 8px 8px;
+}
+
+.prompt-fields {
+    display: flex;
+    gap: 8px;
+}
+
+.prompt-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: calc(var(--mainFontSize) * 0.8);
+    color: var(--SmartThemeEmColor);
+}
+
+.prompt-fields label:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.prompt-fields label:last-child {
+    flex: 0 0 5.5em;
+}
+
+.prompt-fields input,
+.prompt-content {
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    background-color: var(--black30a);
+    outline: none;
+    font: inherit;
+    color: var(--SmartThemeBodyColor);
+}
+
+.prompt-fields input {
+    font-size: calc(var(--mainFontSize) * 0.95);
+}
+
+.prompt-fields input:focus,
+.prompt-content:focus {
+    border-color: var(--white30a);
+}
+
+.prompt-content {
+    min-height: 6em;
+    line-height: 1.5;
+}
+
+.panel-footer {
+    justify-content: space-between;
+}
+
+/* Text boxes the user can drag taller or shorter (resizable-textarea.js).
+   They grow to fit until resized by hand; then longer text scrolls. */
+textarea.resizable-textarea {
+    resize: vertical;
+    overflow-y: auto;
+}
+
+/* ── Slash command autocomplete ──────────── */
+/* Colours and layout follow SillyTavern's autocomplete. */
+
+.autoComplete,
+.autoComplete-details {
+    --ac-color-border: rgb(69, 69, 69);
+    --ac-color-background: rgb(32, 32, 32);
+    --ac-color-text: rgb(204, 204, 204);
+    --ac-color-matchedText: rgb(108, 171, 251);
+    --ac-color-selectedBackground: rgb(32, 57, 92);
+    --ac-color-selectedText: rgb(255, 255, 255);
+    --ac-color-notSelectableBackground: rgb(60, 73, 92);
+    --ac-color-hoveredBackground: rgb(43, 45, 46);
+    --ac-color-argName: rgb(171, 209, 239);
+    --ac-color-type: rgb(131, 199, 177);
+    --ac-color-cmd: rgb(219, 219, 173);
+    --ac-color-string: rgb(190, 146, 122);
+
+    position: absolute;
+    bottom: 100%;
+    z-index: 20;
+    margin: 0 0 6px;
+    padding: 0;
+    background-color: var(--ac-color-background);
+    border: 1px solid var(--ac-color-border);
+    border-radius: 3px;
+    box-shadow: 0 0 20px var(--black70a);
+    color: var(--ac-color-text);
+    line-height: 1.2;
+    overflow: auto;
+}
+
+.autoComplete {
+    left: 0;
+    right: 0;
+    display: grid;
+    grid-template-columns: auto auto minmax(40%, 1fr);
+    align-items: stretch;
+    max-height: 40vh;
+    list-style: none;
+}
+
+.autoComplete > .item {
+    display: contents;
+    cursor: pointer;
+}
+
+.autoComplete > .item > * {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    padding: 4px 6px;
+}
+
+.autoComplete > .item:hover > * {
+    background-color: var(--ac-color-hoveredBackground);
+}
+
+.autoComplete > .item.selected > * {
+    background-color: var(--ac-color-selectedBackground);
+    color: var(--ac-color-selectedText);
+}
+
+.autoComplete > .item.not-selectable {
+    cursor: default;
+}
+
+.autoComplete > .item.not-selectable > * {
+    background-color: var(--ac-color-notSelectableBackground);
+    color: var(--ac-color-selectedText);
+}
+
+.autoComplete .type {
+    justify-content: center;
+    width: 2.25em;
+    font-family: var(--monoFontFamily);
+    font-size: 0.85em;
+}
+
+.autoComplete [data-option-type="command"] .type,
+.autoComplete [data-option-type="hint"] .type {
+    color: var(--ac-color-cmd);
+}
+
+.autoComplete [data-option-type="namedArgument"] .type {
+    color: var(--ac-color-argName);
+}
+
+.autoComplete [data-option-type="enum"] .type {
+    color: var(--ac-color-string);
+}
+
+.autoComplete .specs {
+    gap: 0.6em;
+    white-space: nowrap;
+}
+
+.autoComplete .matched {
+    color: var(--ac-color-matchedText);
+    font-weight: bold;
+}
+
+.autoComplete .arguments,
+.autoComplete-details .arguments {
+    color: var(--ac-color-type);
+    font-family: var(--monoFontFamily);
+    font-size: 0.85em;
+}
+
+.autoComplete .help {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9em;
+    /* Fade only the text; opacity would also fade the row highlight. */
+    color: color-mix(in srgb, currentColor 75%, transparent);
+    line-height: 1.6;
+}
+
+/* Details of the selected suggestion, in the space right of the chat */
+.autoComplete-details {
+    left: calc(100% + 10px);
+    width: min(420px, calc(var(--chatLeft) - 20px));
+    max-height: 70vh;
+    padding: 6px 8px;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* The control panel takes the right side; use the space left of the chat. */
+body.panel-open .autoComplete-details {
+    left: auto;
+    right: calc(100% + 10px);
+}
+
+@media (max-width: 1180px) {
+    body.panel-open .autoComplete-details {
+        display: none;
+    }
+}
+
+.autoComplete-details .specs {
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--ac-color-border);
+}
+
+.autoComplete-details .name {
+    font-weight: bold;
+    color: var(--ac-color-cmd);
+}
+
+.autoComplete-details .detailLine {
+    opacity: 0.75;
+}
+
+.autoComplete-details .argumentList {
+    margin: 0 0 6px;
+    padding-left: 1.2em;
+}
+
+.autoComplete-details .argumentList code {
+    color: var(--ac-color-argName);
+    font-family: var(--monoFontFamily);
+}
+
+.autoComplete-details .argDescription {
+    opacity: 0.75;
+}
+
+.autoComplete-details .helpString > :first-child {
+    margin-top: 0;
+}
+
+.autoComplete-details .helpString > :last-child {
+    margin-bottom: 0;
+}
+
+/* ── Popups ──────────────────────────────── */
+
+.popup {
+    width: min(480px, calc(100vw - 32px));
+    max-height: 85vh;
+    padding: 0;
+    color: var(--SmartThemeBodyColor);
+    background-color: var(--SmartThemeBlurTintColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 10px;
+    box-shadow: 0 0 30px var(--black70a);
+}
+
+.popup.wide {
+    width: min(860px, calc(100vw - 32px));
+}
+
+/* Only when open: the UA stylesheet hides closed dialogs via display. */
+.popup[open] {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup::backdrop {
+    background-color: var(--black50a);
+}
+
+.popup-title {
+    margin: 0;
+    padding: 12px 16px 8px;
+    font-size: calc(var(--mainFontSize) * 1.15);
+}
+
+.popup-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 4px 16px 12px;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+}
+
+.popup-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 10px 16px 14px;
+    border-top: 1px solid var(--white20a);
+}
+
+/* Prompt inspector */
+.prompt-summary {
+    font-weight: 600;
+}
+
+.prompt-note {
+    margin: 2px 0 10px;
+    color: var(--SmartThemeEmColor);
+    font-size: calc(var(--mainFontSize) * 0.9);
+}
+
+.prompt-message {
+    margin-bottom: 8px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-left: 4px solid var(--grey50);
+    border-radius: 5px;
+    background-color: var(--black30a);
+}
+
+.prompt-message[data-role="system"] {
+    border-left-color: var(--SmartThemeQuoteColor);
+}
+
+.prompt-message[data-role="user"] {
+    border-left-color: var(--SmartThemeUnderlineColor);
+}
+
+.prompt-message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px 0;
+}
+
+.prompt-role {
+    font-size: calc(var(--mainFontSize) * 0.8);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--SmartThemeEmColor);
+}
+
+.prompt-tag {
+    padding: 0 6px;
+    border-radius: 4px;
+    background-color: var(--white20a);
+    font-size: calc(var(--mainFontSize) * 0.75);
+}
+
+.prompt-tokens {
+    margin-left: auto;
+    font-size: calc(var(--mainFontSize) * 0.75);
+    color: var(--SmartThemeEmColor);
+    white-space: nowrap;
+}
+
+.prompt-total-tokens {
+    cursor: help;
+}
+
+.prompt-content {
+    padding: 2px 10px 8px;
+    white-space: pre-wrap;
+}
+
+.prompt-raw {
+    margin-top: 12px;
+}
+
+.prompt-raw summary {
+    cursor: pointer;
+    color: var(--SmartThemeEmColor);
+}
+
+.prompt-copy {
+    margin-bottom: 6px;
+}
+
+.prompt-json {
+    margin: 0;
+    padding: 8px 10px;
+    max-height: 40vh;
+    overflow: auto;
+    font-family: var(--monoFontFamily);
+    font-size: calc(var(--mainFontSize) * 0.85);
+    background-color: var(--black50a);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    white-space: pre-wrap;
+}
+
+/* ── Toasts ──────────────────────────────── */
+
+#toast-container {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: min(420px, calc(100vw - 32px));
+    z-index: 100;
+    pointer-events: none;
+}
+
+.toast {
+    padding: 8px 12px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 6px;
+    background-color: var(--SmartThemeBlurTintColor);
+    box-shadow: 0 2px 12px var(--black70a);
+    overflow-wrap: anywhere;
+    pointer-events: auto;
+    cursor: pointer;
+    animation: toast-in 0.15s ease-out;
+}
+
+.toast.error {
+    border-left: 4px solid var(--warning);
+}
+
+.toast.warning {
+    border-left: 4px solid var(--golden);
+}
+
+.toast.info {
+    border-left: 4px solid var(--active);
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+
+/* ── Mobile ──────────────────────────────── */
+
+@media (max-width: 1000px) {
+    :root {
+        --sheldWidth: 100vw;
+        --avatarSize: 40px;
+    }
+
+    /* The panel covers the chat on small screens. */
+    body {
+        --panelWidth: 100vw;
+    }
+
+    #control_panel {
+        border-left: none;
+    }
+
+    #chat {
+        border-left: none;
+        border-right: none;
+    }
+
+    .mes {
+        padding-right: 12px;
+    }
+
+    #send_form,
+    #dialogue_del_mes {
+        border-radius: 0;
+    }
+
+    #form_sheld {
+        padding-bottom: 0;
+    }
+
+    /* No room beside the chat; the list rows still show each item's help. */
+    .autoComplete-details {
+        display: none;
+    }
+}

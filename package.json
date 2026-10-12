@@ -1,0 +1,20 @@
+{
+  "name": "minitalk",
+  "version": "0.1.0",
+  "description": "A lightweight chat frontend for AI APIs, inspired by SillyTavern.",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "express": "^4.22.3",
+    "js-tiktoken": "^1.0.21",
+    "write-file-atomic": "^5.0.1"
+  }
+}

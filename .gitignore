@@ -1,0 +1,7 @@
+node_modules/
+data/_cache/
+data/default-user/secrets.json
+
+# Game data (~18 GB), kept out of version control
+public/game/
+public/Game/
